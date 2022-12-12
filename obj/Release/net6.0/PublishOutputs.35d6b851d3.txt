@@ -1,0 +1,7 @@
+C:\cloud\test\bin\Release\net6.0\publish\test.exe
+C:\cloud\test\bin\Release\net6.0\publish\appsettings.Development.json
+C:\cloud\test\bin\Release\net6.0\publish\appsettings.json
+C:\cloud\test\bin\Release\net6.0\publish\test.dll
+C:\cloud\test\bin\Release\net6.0\publish\test.deps.json
+C:\cloud\test\bin\Release\net6.0\publish\test.runtimeconfig.json
+C:\cloud\test\bin\Release\net6.0\publish\test.pdb

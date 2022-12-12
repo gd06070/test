@@ -1,29 +1,82 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "COVID Vaccination Center";
 }
 
 <html>
+
 <head>
-	<meta charset="utf-8">
-	<title>다음 지도 API</title>
+    <meta charset="utf-8">
+    <title>COVID-19</title>
 </head>
+
 <body>
+    <h2 style="text-align: center;">COVID-19 예방접종센터 위치</h2>
+    <div id="map" style="width:1280px;height:500px;"></div>
 
-	<div id="map" style="width:1000px;height:500px;"></div>
+    <script type="text/javascript"
+        src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=fb8cc27566905b00cc0c95f188a5797f&libraries=clusterer">
+        </script>
 
-	<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=fb8cc27566905b00cc0c95f188a5797f"></script>
-	<script>
-		var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
-		    mapOption = {
-		        center: new kakao.maps.LatLng(37.56667, 126.97863), // 지도의 중심좌표
-		        level: 3, // 지도의 확대 레벨
-		        mapTypeId : kakao.maps.MapTypeId.ROADMAP // 지도종류
-		    }; 
+    <script>
+        const url = 'https://api.odcloud.kr/api/15077586/v1/centers?page=1&perPage=3000&serviceKey=rp4WjcP6B%2FUcYJmhpMRuIgoS87P6yaisS4YmqAqNxljkxtZt%2Fx9z4S0CW8C4kJ%2FaBEzjCECaeQhYF%2BlSd673qA%3D%3D';
 
-		// 지도를 생성한다 
-		var map = new kakao.maps.Map(mapContainer, mapOption); 
+        function makeOverListener(map, marker, infowindow) {
+            return function () {
+                infowindow.open(map, marker)
+            };
+        }
 
+        function makeOutListener(infowindow) {
+            return function () {
+                infowindow.close();
+            };
+        }
 
-	</script>
+        var mapContainer = document.getElementById("map"), 
+            mapOption = {
+                center: new kakao.maps.LatLng(35.12000584, 129.0176037),
+                level: 12, 
+            };
+
+        var map = new kakao.maps.Map(mapContainer, mapOption);
+
+        var clusterer = new kakao.maps.MarkerClusterer({
+            map: map, 
+            averageCenter: true, 
+            minLevel: 5, 
+        });
+
+        fetch(url)
+            .then((res) => res.json())
+            .then((myJson) => {
+                var markers = [];
+                const center_data = myJson.data;
+                const address_data = myJson.data;
+                console.log(JSON.stringify(myJson, null, 1));
+
+                console.log(center_data);
+                for (var i = 0; i < center_data.length; i++) {
+                    var marker = new kakao.maps.Marker({
+                        position: new kakao.maps.LatLng(center_data[i]["lat"], center_data[i]["lng"]),
+                        map: map,
+                    });
+
+                    var iwContent = '<div class="markerInfo" style="width:100%; margin-right:10px; padding:5px;">' + center_data[i].centerName+'<br><small>'+address_data[i].address + '</small></div>';
+                    var infowindow = new kakao.maps.InfoWindow({
+                        content: iwContent
+                        //content: center_data[i]["centerName"] 
+                        //content : address[i]["address"]
+                    }); 
+
+                    markers.push(marker);
+
+                    kakao.maps.event.addListener(marker, "mouseover", makeOverListener(map, marker, infowindow));
+                    kakao.maps.event.addListener(marker, "mouseout", makeOutListener(infowindow));
+                }
+
+                clusterer.addMarkers(markers);
+            });
+    </script>
 </body>
+
 </html>
